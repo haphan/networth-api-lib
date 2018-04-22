@@ -1,4 +1,4 @@
-package main
+package lib
 
 import (
 	"fmt"
@@ -11,7 +11,8 @@ import (
 var snsClient = sns.New(session.New(), aws.NewConfig().WithRegion("us-east-1"))
 var snsTopicARN = GetEnv("SNS_TOPIC_ARN", "")
 
-func notify(message string) {
+// PublishSNS publish message to SNS topic
+func PublishSNS(message string) {
 	fmt.Println("Publishing message:", message)
 	input := &sns.PublishInput{
 		Message:  &message,

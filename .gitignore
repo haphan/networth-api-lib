@@ -1,3 +1,7 @@
+vendor/
+bin/
+template_packaged.yml
+
 # Binaries for programs and plugins
 *.exe
 *.dll

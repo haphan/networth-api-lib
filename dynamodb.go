@@ -20,7 +20,8 @@ type DBInterface interface {
 	GetAccounts() map[string]interface{}
 }
 
-type db struct {
+// DB db struct
+type DB struct {
 	table *dynamodb.DynamoDB
 }
 
@@ -38,7 +39,7 @@ func DocumentClient() *dynamodb.DynamoDB {
 }
 
 // GetTokens return tokens from db
-func (d db) GetTokens(username string) []string {
+func (d DB) GetTokens(username string) []string {
 	req := d.table.GetItemRequest(&dynamodb.GetItemInput{
 		TableName: accountTable,
 		Key: map[string]dynamodb.AttributeValue{
@@ -68,7 +69,7 @@ func (d db) GetTokens(username string) []string {
 }
 
 // GetAccounts return accounts from db
-func (d db) GetAccounts(table *dynamodb.DynamoDB, username string) map[string]interface{} {
+func (d DB) GetAccounts(table *dynamodb.DynamoDB, username string) map[string]interface{} {
 	req := d.table.GetItemRequest(&dynamodb.GetItemInput{
 		TableName: accountTable,
 		Key: map[string]dynamodb.AttributeValue{

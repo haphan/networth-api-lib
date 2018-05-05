@@ -12,7 +12,7 @@ type PlaidClient struct {
 	env         string
 	clientID    string
 	secret      string
-	accessToken string
+	AccessToken string
 }
 
 // Account account
@@ -103,7 +103,7 @@ func (c PlaidClient) get(path string) *http.Response {
 	body := map[string]string{
 		"client_id":    c.clientID,
 		"secret":       c.secret,
-		"access_token": c.accessToken,
+		"access_token": c.AccessToken,
 	}
 
 	jsonBody, _ := json.Marshal(body)

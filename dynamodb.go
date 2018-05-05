@@ -2,6 +2,7 @@ package lib
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -105,6 +106,19 @@ func (d DBClient) UpsertAccounts(username string, account Account) {
 			":column": *dynoData,
 		},
 		UpdateExpression: aws.String("SET #column = :column"),
+	})
+
+	req.Send()
+}
+
+// UpdateNetworth update latest networth amount
+func (d DBClient) UpdateNetworth(username string, networth float64) {
+	req := d.table.PutItemRequest(&dynamodb.PutItemInput{
+		Item: map[string]dynamodb.AttributeValue{
+			"username": {S: aws.String(fmt.Sprintf("%s:networth", username))},
+			"networth": {N: aws.String(strconv.FormatFloat(networth, 'f', 2, 64))},
+		},
+		TableName: accountTable,
 	})
 
 	req.Send()

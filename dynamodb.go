@@ -13,20 +13,13 @@ import (
 
 var accountTable = aws.String(GetEnv("ACCOUNT_TABLE", ""))
 
-// DBInterface db interface
-type DBInterface interface {
-	DocumentClient() *dynamodb.DynamoDB
-	GetTokens() map[string]interface{}
-	GetAccounts() map[string]interface{}
+// DBClient db client struct
+type DBClient struct {
+	table *dynamodb.DynamoDB
 }
 
-// DB db struct
-type DB struct {
-	Table *dynamodb.DynamoDB
-}
-
-// DocumentClient new instance of doc client
-func DocumentClient() *dynamodb.DynamoDB {
+// NewDBClient new dynamodb client
+func NewDBClient() *DBClient {
 	cfg, err := external.LoadDefaultAWSConfig()
 	if err != nil {
 		panic("DynamoDB: Unable to load SDK config: " + err.Error())
@@ -35,12 +28,12 @@ func DocumentClient() *dynamodb.DynamoDB {
 	cfg.Region = endpoints.UsEast1RegionID
 	table := dynamodb.New(cfg)
 
-	return table
+	return &DBClient{table}
 }
 
 // GetTokens return tokens from db
-func (d DB) GetTokens(username string) []string {
-	req := d.Table.GetItemRequest(&dynamodb.GetItemInput{
+func (d DBClient) GetTokens(username string) []string {
+	req := d.table.GetItemRequest(&dynamodb.GetItemInput{
 		TableName: accountTable,
 		Key: map[string]dynamodb.AttributeValue{
 			"username": {S: aws.String(fmt.Sprintf("%s:tokens", username))},
@@ -69,8 +62,8 @@ func (d DB) GetTokens(username string) []string {
 }
 
 // GetAccounts return accounts from db
-func (d DB) GetAccounts(table *dynamodb.DynamoDB, username string) map[string]interface{} {
-	req := d.Table.GetItemRequest(&dynamodb.GetItemInput{
+func (d DBClient) GetAccounts(username string) map[string]interface{} {
+	req := d.table.GetItemRequest(&dynamodb.GetItemInput{
 		TableName: accountTable,
 		Key: map[string]dynamodb.AttributeValue{
 			"username": {S: aws.String(fmt.Sprintf("%s:accounts", username))},

@@ -82,3 +82,30 @@ func (d DBClient) GetAccounts(username string) map[string]interface{} {
 
 	return account
 }
+
+// UpsertAccounts update or insert accounts to db
+func (d DBClient) UpsertAccounts(username string, account Account) {
+	dynoData, err := dynamodbattribute.Marshal(account)
+
+	if err != nil {
+		panic(err)
+	}
+
+	column := fmt.Sprintf("%s:%s", account.Type, account.Mask)
+
+	req := d.table.UpdateItemRequest(&dynamodb.UpdateItemInput{
+		Key: map[string]dynamodb.AttributeValue{
+			"username": {S: aws.String(fmt.Sprintf("%s:accounts", username))},
+		},
+		TableName: accountTable,
+		ExpressionAttributeNames: map[string]string{
+			"#column": column,
+		},
+		ExpressionAttributeValues: map[string]dynamodb.AttributeValue{
+			":column": *dynoData,
+		},
+		UpdateExpression: aws.String("SET #column = :column"),
+	})
+
+	req.Send()
+}
